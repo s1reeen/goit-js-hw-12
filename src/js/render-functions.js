@@ -1,37 +1,34 @@
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-import { gallery } from '../main';
-let lightbox;
+const fragment = document.createDocumentFragment();
+const gallery = document.querySelector('.gallery');
+export function renderFunctions(arrayImg) {
+  arrayImg.forEach(
+    ({
+      webformatURL,
+      largeImageURL,
+      tags,
+      likes,
+      views,
+      comments,
+      downloads,
+    }) => {
+      const galleryItem = document.createElement('li');
+      galleryItem.classList.add('gallery-items');
 
-
-
-export function renderPhotos(data) {
-    const markup = data.hits
-      .map(data => {
-        return `<li class="gallery-item"><a href="${data.webformatURL}">
-              <img class="gallery-image" src="${data.webformatURL}" alt="${data.tags}"></a>
-              <p><b>Likes: </b>${data.likes}</p>
-              <p><b>Views: </b>${data.views}</p>
-              <p><b>Comments: </b>${data.comments}</p>
-              <p><b>Downloads: </b>${data.downloads}</p>
-              </li>`;
-      })
-      .join('');
-  
-    if (lightbox) {
-      lightbox.destroy();
+      galleryItem.insertAdjacentHTML(
+        'beforeend',
+        `<a class='gallery-link' href='${largeImageURL}'>
+        <img class='gallery-image' src='${webformatURL}' alt='${tags}' />
+        <ul class='gallery-ul'>
+          <li class='gallery-item'><h3 class='gallery-title'>Likes</h3><p class='gallery-value'>${likes}</p></li>
+          <li class='gallery-item'><h3 class='gallery-title'>Views</h3><p class='gallery-value'>${views}</p></li>
+          <li class='gallery-item'><h3 class='gallery-title'>Comments</h3><p class='gallery-value'>${comments}</p></li>
+          <li class='gallery-item'><h3 class='gallery-title'>Downloads</h3><p class='gallery-value'>${downloads}</p></li>
+        </ul>
+      </a>`
+      );
+      fragment.appendChild(galleryItem);
     }
-  
-    gallery.insertAdjacentHTML('beforeend', markup);
-    lightbox = new SimpleLightbox('.gallery a', options);
-    lightbox.on('show.simplelightbox');
-    lightbox.refresh();
-  }
-  const options = {
-    captions: true,
-    captionSelector: 'img',
-    captionType: 'attr',
-    captionsData: 'alt',
-    captionPosition: 'bottom',
-    animation: 250,
-  };
+  );
+
+  gallery.appendChild(fragment);
+}
