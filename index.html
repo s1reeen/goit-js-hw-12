@@ -1,35 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>goit-js-hw-12</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap"
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css"
     />
-    <title>Document</title>
-  <script type="module" crossorigin src="/goit-js-hw-12/commonHelpers.js"></script>
-  <link rel="modulepreload" crossorigin href="/goit-js-hw-12/assets/vendor-64b55ca9.js">
-  <link rel="stylesheet" href="/goit-js-hw-12/assets/vendor-cf6910df.css">
-  <link rel="stylesheet" href="/goit-js-hw-12/assets/index-841f1e96.css">
-</head>
-<body>
-    <div class="container">
-        <form action="" class="form">
-          <label class="input" for="input"
-            ><input type="text" name="input" placeholder="Search images..."
-          /></label>
-          <button class="btn" type="submit">Search</button>
-        </form>
-        <ul class="gallery"></ul>
-        <button type="button" class="load-more" style="display: none">
-          Load more
-        </button>
-      </div>
-     
     
-</body>
+    <script type="module" crossorigin src="/goit-js-hw-12/commonHelpers.js"></script>
+    <link rel="modulepreload" crossorigin href="/goit-js-hw-12/assets/vendor-5401a4b0.js">
+    <link rel="stylesheet" href="/goit-js-hw-12/assets/vendor-cf6910df.css">
+    <link rel="stylesheet" href="/goit-js-hw-12/assets/index-39925869.css">
+  </head>
+  <body>
+    <form class="form">
+      <input class="input" type="input" />
+      <button class="button" type="submit">Search</button>
+    </form>
+
+    <ul class="gallery"></ul>
+
+    <button class="button load-more hide" type="submit">Load more</button>
+    <span class="loader hide">Load&nbsp;ng</span>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"
+      type="text/javascript"
+    ></script>
+
+    
+  </body>
 </html>
