@@ -1,127 +1,88 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-import { pixabayApi } from './js/pixabay-api.js';
-import { renderFunctions } from './js/render-functions.js';
+/*=============================================================*/
+import renderImages from './js/render-functions';
+import { infoAPI } from './js/pizsbay-api';
 
-const form = document.querySelector('.form');
+const form = document.querySelector('.js-form');
 const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
-const btnLoad = document.querySelector('.load-more');
+const loadMore = document.querySelector('.js-load-more');
 
-const BASE_URL = 'https://pixabay.com/api/?';
-const request = {
-  key: '42159131-e2480a23f0f5c24b1f6f03d93',
-  q: '',
-  image_type: 'photo',
-  orientation: 'horizontal',
-  safesearch: true,
-  per_page: 15,
-  page: 1,
-};
+const newInfoApi = new infoAPI();
+let checkLastHits = 0;
 
-let totalImg = 0;
+form.addEventListener('submit', creatGallery);
+loadMore.addEventListener('click', addNewInfo);
 
-const options = {
-  overlayOpacity: 0.8,
-  captionsData: 'alt',
-  captionDelay: 250,
-};
-
-const lightbox = new SimpleLightbox('.gallery a', options);
-
-form.addEventListener('submit', event => {
+async function creatGallery(event) {
   event.preventDefault();
-
+  const infoSearch = form.elements.text.value.trim();
+  form.elements.text.value = '';
   gallery.innerHTML = '';
-  request.page = 1;
 
-  const input = document.querySelector('input');
-  const inputValue = input.value.trim();
+  if (infoSearch) {
+    loader.classList.remove('visually-hidden');
 
-  if (!inputValue) {
-    iziToast.warning({
-      message: 'You forgot to enter your details',
-    });
-  } else {
-    showLoader();
-    request.q = inputValue;
-    const url = BASE_URL + new URLSearchParams(request);
-    getImages(url);
-  }
-  input.value = '';
-});
+    newInfoApi.page = 1;
+    newInfoApi.query = infoSearch;
 
-const getImages = async (url, scrollHight) => {
-  await pixabayApi(url)
-    .then(({ data }) => {
-      const arrayImg = data.hits;
-      totalImg = data.totalHits;
+    try {
+      const data = await newInfoApi.getInfoArticles(infoSearch);
+      checkLastHits = Math.ceil(data.totalHits / infoAPI.PAGE_SIZE);
+      renderImages(data.hits);
 
-      if (arrayImg.length > 0) {
-        render(arrayImg);
-        window.scrollBy({
-          top: scrollHight,
-          behavior: 'smooth',
+      if (newInfoApi.page === checkLastHits) {
+        loadMore.classList.add('visually-hidden');
+        iziToast.info({
+          position: 'topRight',
+          message: `We're sorry, but you've reached the end of search results.`,
         });
       } else {
-        showLoader();
-        iziToast.warning({
-          message:
-            'Sorry, there are no images matching your search query. Please try again!',
-          color: '#f83d04',
-        });
+        loadMore.classList.remove('visually-hidden');
       }
-    })
-    .catch(error => {
-      iziToast.warning({
-        message: error,
+    } catch {
+      loadMore.classList.add('visually-hidden');
+      loader.classList.add('visually-hidden');
+      iziToast.error({
+        position: 'topRight',
+        message:
+          'Sorry, there are no images matching your search query. Please try again!',
       });
-    });
-};
-
-function render(arrayImg) {
-  renderFunctions(arrayImg);
-
-  showLoader();
-  btnLoad.classList.remove('hide');
-  lightbox.refresh();
-  totalImgFunction();
-}
-
-btnLoad.addEventListener('click', () => {
-  request.page += 1;
-  const url = BASE_URL + new URLSearchParams(request);
-
-  showLoader();
-  btnLoad.classList.add('hide');
-
-  const scrollHight =
-    document.querySelector('.gallery-items').getBoundingClientRect().height *
-      2 +
-    26;
-
-  getImages(url, scrollHight);
-});
-
-function showLoader() {
-  if (loader.classList.contains('hide')) {
-    loader.classList.remove('hide');
+    }
   } else {
-    loader.classList.add('hide');
-    btnLoad.classList.add('hide');
+    iziToast.error({
+      position: 'topRight',
+      message:
+        'Sorry, there are no images matching your search query. Please try again!',
+    });
   }
 }
 
-function totalImgFunction() {
-  if (
-    totalImg < request.page * request.per_page &&
-    !btnLoad.classList.contains('hide')
-  ) {
-    btnLoad.classList.add('hide');
+async function addNewInfo() {
+  loader.classList.remove('visually-hidden');
+  loadMore.classList.add('visually-hidden');
+
+  if (newInfoApi.page < checkLastHits) {
+    loadMore.classList.remove('visually-hidden');
+    newInfoApi.page += 1;
+    const data = await newInfoApi.getInfoArticles();
+    renderImages(data.hits);
+
+    const heightElement = document.querySelector('.gallery-item');
+    const height = heightElement.getBoundingClientRect();
+
+    window.scrollBy({
+      top: height.height * 2,
+      behavior: 'smooth',
+    });
+  }
+
+  if (newInfoApi.page === checkLastHits) {
+    loadMore.classList.add('visually-hidden');
     iziToast.info({
-      message: "We're sorry, but you've reached the end of search results.",
+      position: 'topRight',
+      message: `We're sorry, but you've reached the end of search results.`,
     });
   }
 }

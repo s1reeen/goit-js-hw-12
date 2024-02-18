@@ -1,34 +1,33 @@
-const fragment = document.createDocumentFragment();
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+
 const gallery = document.querySelector('.gallery');
-export function renderFunctions(arrayImg) {
-  arrayImg.forEach(
-    ({
-      webformatURL,
-      largeImageURL,
-      tags,
-      likes,
-      views,
-      comments,
-      downloads,
-    }) => {
-      const galleryItem = document.createElement('li');
-      galleryItem.classList.add('gallery-items');
+const loader = document.querySelector('.loader');
 
-      galleryItem.insertAdjacentHTML(
-        'beforeend',
-        `<a class='gallery-link' href='${largeImageURL}'>
-        <img class='gallery-image' src='${webformatURL}' alt='${tags}' />
-        <ul class='gallery-ul'>
-          <li class='gallery-item'><h3 class='gallery-title'>Likes</h3><p class='gallery-value'>${likes}</p></li>
-          <li class='gallery-item'><h3 class='gallery-title'>Views</h3><p class='gallery-value'>${views}</p></li>
-          <li class='gallery-item'><h3 class='gallery-title'>Comments</h3><p class='gallery-value'>${comments}</p></li>
-          <li class='gallery-item'><h3 class='gallery-title'>Downloads</h3><p class='gallery-value'>${downloads}</p></li>
-        </ul>
-      </a>`
-      );
-      fragment.appendChild(galleryItem);
-    }
-  );
+export default function renderImages(images) {
+  loader.classList.add('visually-hidden');
+  const markup = images
+    .map(img => {
+      return `<li class="gallery-item">
+		   <a class="gallery-link" href=${img.largeImageURL}>
+			   <img class="gallery-image" src=${img.webformatURL} alt="${img.tags}" />
+		   </a>
+		   <div class="container">
+			   <div class="container-text"><h3 class="titel-text">Likes</h3><p class="text">${img.likes}</p></div>
+			   <div class="container-text"><h3 class="titel-text">Views</h3><p class="text">${img.views}</p></div>
+			   <div class="container-text"><h3 class="titel-text">Comments</h3><p class="text">${img.comments}</p></div>
+			   <div class="container-text"><h3 class="titel-text">Dowloads</h3><p class="text">${img.downloads}</p></div>
+		   </div>
+	   </li>`;
+    })
+    .join('');
+  gallery.insertAdjacentHTML('beforeend', markup);
 
-  gallery.appendChild(fragment);
+  let galleryModalWindow = new SimpleLightbox('.gallery-link', {
+    captionsData: 'alt',
+    captionPosition: 'bottom',
+    captionDelay: 250,
+  });
+
+  galleryModalWindow.refresh();
 }
